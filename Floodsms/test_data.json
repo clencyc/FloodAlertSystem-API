@@ -1,0 +1,16 @@
+{
+    "sensor_id": "flood_sensor_561",
+    "sensor_timestamp": "2025-05-20T12:50:00+03:00",
+    "location": {
+      "latitude": -1.286389,
+      "longitude": 36.817223,
+      "area_name": "Juja"
+    },
+    "readings": {
+      "water_level_cm": 120.5,
+      "rainfall_mm_per_hour": 15.2
+    },
+    "alert_level": "critical",
+    "battery_level": 90,
+    "network_status": "2G"
+  }
