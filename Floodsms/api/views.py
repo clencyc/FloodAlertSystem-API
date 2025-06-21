@@ -1,6 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+
+from drf_spectacular.utils import extend_schema
+
 from .models import Sensor_data, Receipients, SMSDeliveryReport
 from .serializers import SensorDataSerializer
 import africastalking
@@ -14,8 +17,18 @@ africastalking.initialize(
 )
 sms = africastalking.SMS
 
-
 class SensorDataView(APIView):
+    @extend_schema(
+        request=SensorDataSerializer,
+        responses={
+            200: {
+                "status": "success",
+                "sms_error": "Optional error message if SMS sending fails"
+            },
+            400: "Validation errors"
+        },
+        description="Endpoint to submit sensor data. Sends SMS alerts if critical conditions are met."
+    )
     def post(self, request):
         serializer = SensorDataSerializer(data=request.data)
         if serializer.is_valid():
@@ -27,6 +40,7 @@ class SensorDataView(APIView):
                     return Response({"status": "success", "sms_error": sms_result['error']}, status=status.HTTP_200_OK)
             return Response({"status": "success"}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
     def check_alert(self, data):
         readings = data.get('readings', {})
@@ -60,6 +74,15 @@ class SensorDataView(APIView):
             return {"error": str(e)}
 
 class SMSDeliveryCallbackView(APIView):
+    @extend_schema(
+              request=None,
+              responses={
+                   200: {
+                          "status": "callback received"
+                   }
+              },
+              description="Endpoint to handle SMS delivery callbacks from Africa's Talking."
+    )
     def post(self, request):
         data = request.data
         print(f"Delivery Callback: {data}")
